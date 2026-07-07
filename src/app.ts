@@ -1,4 +1,5 @@
 import express, {Request, Response, NextFunction } from "express";
+import productRouter from './routes/product.route';
 
 const app = express();
 
@@ -6,14 +7,16 @@ const app = express();
 app.use(express.json());
 
 // health route
-app.get("/", (req, res) => {
+app.get("/",(req, res) => {
     res.status(200).json({
         message : "Server is up and running!!",
         status : "success",
         success : true,
-        data : null,
+        data : [],
     });
 });
+
+app.use("/products", productRouter);
 
 // path not found
 app.use((req:Request, res:Response, next : NextFunction) => {
