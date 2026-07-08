@@ -1,14 +1,11 @@
 import app from "./app.js";
-import mongoose from "mongoose";
+import { connectDatabase } from "./config/db.config.js";
 
-mongoose.connect("mongodb://localhost:27017/e-commerce_db",{autoCreate : true}).then(() => {
-    console.log("Database connected successfully!");
-})
-.catch((error) => {
-    console.log("Database cannot connect!");
-    console.log(error);
-});
+const PORT = 8002;
+const DB_URI = "mongodb://localhost:27017";
 
-app.listen(8002,() => {
+connectDatabase(DB_URI);
+
+app.listen(PORT,() => {
     console.log("Server is start at http://localhost:8002");
 });

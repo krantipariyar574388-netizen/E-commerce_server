@@ -19,3 +19,5 @@ const productSchema: Schema = new mongoose.Schema({
 const Product = mongoose.model("product", productSchema);
 
 export default Product;
+
+//fullname, email, password, profile_image
