@@ -1,5 +1,5 @@
 import app from "./app.js";
-import { connectDatabase } from "./config/db.config.js";
+import { connectDatabase } from "./config/db.config";
 
 const PORT = 8002;
 const DB_URI = "mongodb://localhost:27017";
