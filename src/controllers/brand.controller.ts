@@ -1,58 +1,60 @@
-import { Request, Response, NextFunction } from "express";
-import Product from "../models/product.models";
+import { Request, Response,NextFunction } from "express";
+import Brand from "../models/brand.model";
 
-export const getAll = async (req: Request, res: Response, next : NextFunction) => {
+export const getAll = async (req : Request, res : Response, next : NextFunction) => {
     try {
-        const products = await Product.find({});
+        const brand = await Brand.find({});
         res.status(200).json({
         message : "Server is up and running!!",
         status : "success",
         success : true,
-        data : products,
+        data : brand,
     });
     } catch (error) {
         next(error);
     }
 };
 
-export const getById = async (req: Request, res: Response, next : NextFunction) => {
+export const getById = async (req : Request, res : Response, next : NextFunction) => {
     try {
         const { id } = req.params;
-        const product = await Product.findById({_id: id});
-        
-        if(!product) {
+        const brand = await Brand.findById({_id: id});
+
+        if(!brand) {
             res.status(404).json({
-            message : `Product by id: ${id} not found`,
+            message : `Brand by id: ${id} not found`,
             status : "false",
             data : null,
         });
         return;
         }
         res.status(200).json({
-        message : "Product fetched successfully!",
+        message : "Brand fetched successfully!",
         status : "true",
-        data : product,
+        data : brand,
     });
-} catch (error) { 
-    next(error);
+    } catch (error) {
+        next(error);
     }
 };
 
 export const create = async (req: Request, res: Response, next : NextFunction) => {
    try { 
     console.log(req.body);
-    const {name, rate, quantity} = req.body;
+    const {name, description, logo} = req.body;
 
-    const product = await Product.create({
-        name : name,
-        rate : rate,
-        quantity : quantity,
+    const brand = new Brand({
+        name ,
+        description ,
+        logo ,
     });
 
+    await brand.save();
+
      res.status(200).json({
-        message : "Product created successfully!",
+        message : "Brand created successfully!",
         status : "true",
-        data : product,
+        data : brand,
     });
    } catch (error) {
     next(error);
@@ -62,13 +64,13 @@ export const create = async (req: Request, res: Response, next : NextFunction) =
 export const update = async (req: Request, res: Response, next : NextFunction) => {
     try {
         const {id} = req.params;
-        const {name, rate, quantity} = req.body;
+        const {name, description, logo} = req.body;
 
-        const product = await Product.findByIdAndUpdate({_id: id}, {name, rate, quantity}, {new : true, runValidators: true});
+        const brand = await Brand.findByIdAndUpdate({_id: id}, {name, description, logo}, {new : true, runValidators: true});
 
-        if (!product) {
+        if (!brand) {
             res.status(404).json({
-                message : `Product by id: ${id} not updated`,
+                message : `Brand by id: ${id} not updated`,
                 success : false,
                 data : null,
             });
@@ -76,9 +78,9 @@ export const update = async (req: Request, res: Response, next : NextFunction) =
         }
 
         res.status(200).json({
-            message : "Product updated",
+            message : "Brand updated",
             success : true,
-            data : product,
+            data : brand,
         });
     } catch (error) {
         next(error);
@@ -89,16 +91,16 @@ export const remove = async (req: Request, res: Response, next : NextFunction) =
     try {
         const {id} = req.params;
 
-        const product = await Product.findByIdAndDelete(id);
-        if (!product) {
+        const brand = await Brand.findByIdAndDelete(id);
+        if (!brand) {
             res.status(404).json({
-            message : "product by id: ${id} not deleted",
+            message : "Brand by id: ${id} not deleted",
             status : "true",
             data : [],
             });
         } else {
             res.status(200).json({
-            message : "Product are deleted.",
+            message : "Brand are deleted.",
             status : "true",
             data : [],
             });
