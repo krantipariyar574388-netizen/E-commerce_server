@@ -10,8 +10,8 @@ interface IBrand extends Document {
 const brandSchema : Schema = new mongoose.Schema<IBrand>({
     name : {
         type : "String",
-        required : true,
-        minLength : 3,
+        required : [true,"Name is required!"],
+        unique : [true, "Brand already exits!"],
         trim : true,
     },
     description : {

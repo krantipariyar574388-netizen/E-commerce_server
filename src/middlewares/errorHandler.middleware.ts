@@ -1,4 +1,5 @@
 import {Request, Response, NextFunction } from "express";
+import { sendResponse } from "../utils/sendResponse.utils";
 
 export const errorHandler = (
     error : any,
@@ -7,7 +8,7 @@ export const errorHandler = (
     next : NextFunction
 ) => {
     const message = error?.status ?? "Something went wrong!";
-    const status = error?.status ?? "error";
+    // const status = error?.status ?? "error";
     const statusCode = error?.statusCode ?? 500;
 
     console.log(error);
@@ -20,3 +21,11 @@ export const errorHandler = (
         stack : error?.stack,
     });
 }
+
+// sendResponse(res, {
+//     message,
+//         status,
+//         success : false,
+//         data : null,
+//         stack : error?.stack,
+// })

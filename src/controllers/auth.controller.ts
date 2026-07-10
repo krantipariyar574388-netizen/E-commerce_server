@@ -1,44 +1,20 @@
 import { Request, Response,NextFunction } from "express";
 import Authentication from "../models/auth.model";
 import {comparePassword, hashPassword} from "../utils/bcrypt.util";
+import AppError from "../utils/customError.utils";
+import { cathAsync } from "../utils/catchAsync.utils";
+import { sendResponse } from "../utils/sendResponse.utils";
 
 // 1. Register User
-export const register = async (req: Request, res: Response, next : NextFunction) => {
-  try {
+export const register = cathAsync(async (req: Request, res: Response, next : NextFunction) => {
+
     const { fullName, email, password } = req.body;
 
-    // Check if email already exists
-    // const User = await Authentication.findOne({ email });
+     if(!fullName) throw new AppError ("Full name is required",400);
 
-    // if (existingUser) {
-    //   res.status(400).json({
-    //     message: "User with this email already exists",
-    //     success: false,
-    //     data: null,
-    //   });
-    //   return;
-    // }
+    if(!email) throw new AppError ("Email is required",400);
 
-    if(!fullName) {
-      const error : any = new Error("Full name is required");
-      error.status = "fail";
-      error.statusCode = 400;
-      throw error;
-    }
-
-    if(!email) {
-      const error : any = new Error("Email is required");
-      error.status = "fail";
-      error.statusCode = 400;
-      throw error;
-    }
-
-    if(!password) {
-      const error : any = new Error("password is required");
-      error.status = "fail";
-      error.statusCode = 400;
-      throw error;
-    }
+    if(!password) throw new AppError ("Password is required", 400);
 
     const newUser = new Authentication({
       fullName,
@@ -53,92 +29,57 @@ export const register = async (req: Request, res: Response, next : NextFunction)
     //save user
     await newUser.save();
 
-    res.status(201).json({
+    // success response
+    sendResponse(res, {
       message: "User registered successfully!",
-      status: "success",
-      success: true,
       data: {
         _id : newUser._id,
         email : newUser.email,
         fullName : newUser.fullName,
         role : newUser.role,
       },
+      statusCode : 201,
     });
-  } catch (error) {
-    next(error);
-  }
-};
+    });
 
-export const login = async (req: Request, res: Response, next : NextFunction) => {
-  try {
+export const login = cathAsync(async (req: Request, res: Response, next : NextFunction) => {
     const { email, password } = req.body;
 
-    // const user = await Authentication.findOne({ email });
+    if(!email) throw new AppError ("Email is required", 400);
 
-    // if (!user) {
-    //   res.status(400).json({
-    //     message: "Invalid email!",
-    //     success: false,
-    //     data: null,
-    //   });
-    //   return;
-    // }
-
-    // if (user.password !== password) {
-    //   res.status(400).json({
-    //     message: "Invalid password!",
-    //     success: false,
-    //     data: null,
-    //   });
-    //   return;
-    // }
-
-    if(!email) {
-      const error : any = new Error("Email is required");
-      error.status = "fail";
-      error.statusCode = 400;
-      throw error;
-    }
-
-    if(!password) {
-      const error : any = new Error("password is required");
-      error.status = "fail";
-      error.statusCode = 400;
-      throw error;
-    }
-
+    if(!password) throw new AppError ("Password is required", 400);
     const user = await Authentication.findOne({email}).select("+password");
 
-    if(!user) {
-      const error : any = new Error("invalid credentials");
-      error.status = "fail";
-      error.statusCode = 400;
-      throw error;
-    }
+    if(!user) throw new AppError ("Invalid credentials", 400);
 
     // check password
     const isPasswordMatched = await comparePassword(password, user.password);
 
     //password not matched
-    if (!isPasswordMatched) {
-      const error : any = Error("invalid credentials");
-      error.status = "fail";
-      error.statusCode = 400;
-      throw error;
-    }
+    if (!isPasswordMatched) throw new AppError ("Invalid credentials", 400);
 
-    res.status(200).json({
+//     res.status(200).json({
+//       message: "Logged in successfully!",
+//       status: "success",
+//       success: true,
+//       data: {
+//         _id : user._id,
+//         email : user.email,
+//         fullName : user.fullName,
+//         role : user.role,
+//       },
+//     });
+//   }
+// )
+
+sendResponse(res, {
       message: "Logged in successfully!",
-      status: "success",
-      success: true,
       data: {
         _id : user._id,
         email : user.email,
         fullName : user.fullName,
         role : user.role,
       },
+      statusCode : 201,
     });
-  } catch (error) {
-    next(error);
-  }
-};
+});
