@@ -10,6 +10,9 @@ export const register = cathAsync(async (req: Request, res: Response, next : Nex
 
     const { fullName, email, password } = req.body;
 
+    const file = req.file;
+    console.log(file);
+
      if(!fullName) throw new AppError ("Full name is required",400);
 
     if(!email) throw new AppError ("Email is required",400);
@@ -26,6 +29,11 @@ export const register = cathAsync(async (req: Request, res: Response, next : Nex
     const hash = await hashPassword(password);
     newUser.password = hash;
 
+    // upload profile image
+    if (file) {
+      newUser.profile_image = file.path;
+    }
+
     //save user
     await newUser.save();
 
@@ -37,6 +45,7 @@ export const register = cathAsync(async (req: Request, res: Response, next : Nex
         email : newUser.email,
         fullName : newUser.fullName,
         role : newUser.role,
+        profile_image : newUser.profile_image,
       },
       statusCode : 201,
     });

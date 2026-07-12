@@ -1,5 +1,5 @@
 import {Request, Response, NextFunction } from "express";
-import { sendResponse } from "../utils/sendResponse.utils";
+// import { sendResponse } from "../utils/sendResponse.utils";
 
 export const errorHandler = (
     error : any,
@@ -15,7 +15,6 @@ export const errorHandler = (
 
     res.status(statusCode).json({
         message,
-        status,
         success : false,
         data : null,
         stack : error?.stack,

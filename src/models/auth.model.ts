@@ -20,7 +20,7 @@ const authSchema: Schema = new mongoose.Schema<IUser>(
     email: {
       type: String,
       required: [true,'Email is required'],
-      unique: true,
+      unique: [true,'Already Exist!'],
       lowercase: true,
       trim: true,
     },
