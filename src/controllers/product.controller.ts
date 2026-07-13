@@ -1,110 +1,102 @@
 import { Request, Response, NextFunction } from "express";
 import Product from "../models/product.models";
+import AppError from "../utils/customError.utils";
+import { cathAsync } from "../utils/catchAsync.utils";
+import { sendResponse } from "../utils/sendResponse.utils";
 
-export const getAll = async (req: Request, res: Response, next : NextFunction) => {
-    try {
-        const products = await Product.find({});
-        res.status(200).json({
-        message : "Server is up and running!!",
-        status : "success",
-        success : true,
-        data : products,
+export const getAll = cathAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const product = await Product.find({}).sort({ createdAt: -1 });
+
+    sendResponse(res, {
+      statusCode: 200,
+      message: product.length > 0 ? "Product fetched successfully!" : "No products found",
+      data: product,
     });
-    } catch (error) {
-        next(error);
-    }
-};
+  }
+);
 
-export const getById = async (req: Request, res: Response, next : NextFunction) => {
-    try {
-        const { id } = req.params;
-        const product = await Product.findById({_id: id});
-        
-        if(!product) {
-            res.status(404).json({
-            message : `Product by id: ${id} not found`,
-            status : "false",
-            data : null,
-        });
-        return;
-        }
-        res.status(200).json({
-        message : "Product fetched successfully!",
-        status : "true",
-        data : product,
+export const getById = cathAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+
+    const product = await Product.findById(id);
+
+    if (!product) {
+      throw new AppError(`product with id: ${id} not found`, 404);
+    }
+
+    sendResponse(res, {
+      statusCode: 200,
+      message: "Product fetched successfully!",
+      data: product,
     });
-} catch (error) { 
-    next(error);
-    }
-};
+  }
+);
 
-export const create = async (req: Request, res: Response, next : NextFunction) => {
-   try { 
-    console.log(req.body);
-    const {name, rate, quantity} = req.body;
+export const create = cathAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { name, rate, quantity } = req.body;
 
-    const product = await Product.create({
-        name : name,
-        rate : rate,
-        quantity : quantity,
+    const file = req.file;
+    console.log(file);
+
+    if (!name) throw new AppError("Product name is required", 400);
+
+    const product = new Product({
+      name,
+      rate,
+      quantity,
     });
 
-     res.status(200).json({
-        message : "Product created successfully!",
-        status : "true",
-        data : product,
+
+    await product.save();
+
+    sendResponse(res, {
+      statusCode: 201,
+      message: "Product created successfully!",
+      data: product,
     });
-   } catch (error) {
-    next(error);
-   }
-};
+  }
+);
 
-export const update = async (req: Request, res: Response, next : NextFunction) => {
-    try {
-        const {id} = req.params;
-        const {name, rate, quantity} = req.body;
+export const update = cathAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const { name, rate, quantity } = req.body;
 
-        const product = await Product.findByIdAndUpdate({_id: id}, {name, rate, quantity}, {new : true, runValidators: true});
+    const product = await Product.findByIdAndUpdate(
+      id,
+      { name, rate, quantity },
+      { new: true, runValidators: true }
+    );
 
-        if (!product) {
-            res.status(404).json({
-                message : `Product by id: ${id} not updated`,
-                success : false,
-                data : null,
-            });
-            return;
-        }
-
-        res.status(200).json({
-            message : "Product updated",
-            success : true,
-            data : product,
-        });
-    } catch (error) {
-        next(error);
+    if (!product) {
+      throw new AppError(`Product with id: ${id} not found`, 404);
     }
-};
 
-export const remove = async (req: Request, res: Response, next : NextFunction) => {
-    try {
-        const {id} = req.params;
+    sendResponse(res, {
+      statusCode: 200,
+      message: "Product updated successfully!",
+      data: product,
+    });
+  }
+);
 
-        const product = await Product.findByIdAndDelete(id);
-        if (!product) {
-            res.status(404).json({
-            message : "product by id: ${id} not deleted",
-            status : "true",
-            data : [],
-            });
-        } else {
-            res.status(200).json({
-            message : "Product are deleted.",
-            status : "true",
-            data : [],
-            });
-        }
-       
-    } catch (error) {
-        next(error);
+export const remove = cathAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+
+    const product = await Product.findByIdAndDelete(id);
+
+    if (!product) {
+      throw new AppError(`Product with id: ${id} not found`, 404);
     }
-};
+
+    sendResponse(res, {
+      statusCode: 200,
+      message: "Product deleted successfully!",
+      data: null,
+    });
+  }
+);
