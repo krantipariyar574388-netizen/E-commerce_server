@@ -7,13 +7,18 @@ import {
     getById,
 } from "../controllers/brand.controller";
 
-const router : Router = express.Router();
+import { uploader } from "../middlewares/multer.middleware";
+
+const router: Router = express.Router();
+
+// multer uploader
+const upload = uploader();
 
 router.get("/", getAll);
 
 router.get("/:id", getById);
 
-router.post("/", create);
+router.post("/", upload.single("logo") ,create);
 
 router.put("/:id", update);
 

@@ -21,7 +21,7 @@ const brandSchema : Schema = new mongoose.Schema<IBrand>({
     },
     logo : {
         type : "String",
-        required : true,
+        required : [true,"logo is required"],
     },
 },
 {
