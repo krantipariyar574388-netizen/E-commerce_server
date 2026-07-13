@@ -1,11 +1,12 @@
+import "dotenv/config";
 import app from "./app.js";
 import { connectDatabase } from "./config/db.config";
 
-const PORT = 8002;
-const DB_URI = "mongodb://localhost:27017";
+const PORT = process.env.PORT;
+const DB_URI = process.env.DB_URI!!;
 
 connectDatabase(DB_URI);
 
 app.listen(PORT,() => {
-    console.log("Server is start at http://localhost:8002");
+    console.log(`Server is start at http://localhost:${PORT}`);
 });
