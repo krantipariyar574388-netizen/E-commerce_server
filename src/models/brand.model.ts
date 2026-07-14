@@ -1,5 +1,6 @@
 // name , description?, logo
 import mongoose, {Schema} from "mongoose";
+import { ImageSchema } from "./image.model";
 
 interface IBrand extends Document {
     name : String;
@@ -20,7 +21,7 @@ const brandSchema : Schema = new mongoose.Schema<IBrand>({
         trim :true, 
     },
     logo : {
-        type : "String",
+        type : ImageSchema,
         required : [true,"logo is required"],
     },
 },

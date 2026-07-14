@@ -31,15 +31,14 @@ export const uploader = () => {
     },
   });
 
-  // file filter
+    //* file filter
   const fileFilter = (
     req: Request,
     file: Express.Multer.File,
     cb: FileFilterCallback,
   ) => {
-    const file_ext = path.extname(file.originalname);
-
-    // check if file ext is allowed
+    const file_ext = path.extname(file.originalname).toLocaleLowerCase();
+    //* check if file ext is allowed
     if (!allowed_extensions.includes(file_ext)) {
       cb(
         new AppError(

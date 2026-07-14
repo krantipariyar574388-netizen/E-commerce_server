@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import { Role } from "../@types/enum.types";
+import { ImageSchema } from "./image.model";
 
 interface IUser extends Document {
   fullName : string;
@@ -36,8 +37,8 @@ const authSchema: Schema = new mongoose.Schema<IUser>(
       select : false,
     },
     profile_image: {
-      type: String,
-      default: "",
+      type: ImageSchema,
+      default: null,
     },
   },
   {
