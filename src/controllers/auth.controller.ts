@@ -4,6 +4,7 @@ import {comparePassword, hashPassword} from "../utils/bcrypt.util";
 import AppError from "../utils/customError.utils";
 import { cathAsync } from "../utils/catchAsync.utils";
 import { sendResponse } from "../utils/sendResponse.utils";
+import { generateJwtToken } from "../utils/jwt.util";
 
 // 1. Register User
 export const register = cathAsync(async (req: Request, res: Response, next : NextFunction) => {
@@ -67,28 +68,20 @@ export const login = cathAsync(async (req: Request, res: Response, next : NextFu
     //password not matched
     if (!isPasswordMatched) throw new AppError ("Invalid credentials", 400);
 
-//     res.status(200).json({
-//       message: "Logged in successfully!",
-//       status: "success",
-//       success: true,
-//       data: {
-//         _id : user._id,
-//         email : user.email,
-//         fullName : user.fullName,
-//         role : user.role,
-//       },
-//     });
-//   }
-// )
+    //* generate jwt token  -> encode
+  const access_token = generateJwtToken({
+    _id: user._id,
+    email: user.email,
+    role: user.role,
+  });
+
+  //* convert user document to object
+  const { password: p, __v, ...rest } = user.toObject();
+
 
 sendResponse(res, {
-      message: "Logged in successfully!",
-      data: {
-        _id : user._id,
-        email : user.email,
-        fullName : user.fullName,
-        role : user.role,
-      },
-      statusCode : 201,
-    });
+    message: "Login successful",
+    data: { user: rest, access_token },
+    statusCode: 201,
+  });
 });
