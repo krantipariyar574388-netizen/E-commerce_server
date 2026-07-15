@@ -12,7 +12,7 @@ const categorySchema = new mongoose.Schema({
         minLength : 25,
         trim : true,
    },
-   logo : {
+   image : {
     type : ImageSchema,
     required : [true, "Logo is required"],
     default : null,

@@ -4,8 +4,7 @@ import AppError from "../utils/customError.utils";
 import { cathAsync } from "../utils/catchAsync.utils";
 import { sendResponse } from "../utils/sendResponse.utils";
 import { upload } from "../utils/cloudinary.util";
-import { deleteFileFormCloudinary } from "../config/cloudinary.config";
-import path from "path";
+import { deleteFileFormCloudinary } from "../utils/cloudinary.util";
 
 export const getAll = cathAsync (
     async (req : Request, res : Response, next : NextFunction) => {
@@ -50,8 +49,8 @@ export const create = cathAsync(async(req : Request, res : Response, next : Next
 
     if (file){
       // upload image to cloudinary and set logo
-      const { path: uploadedPath, public_id } = await upload(file, '/brands');
-      category.logo = {
+      const { path: uploadedPath, public_id } = await upload(file, '/category');
+      category.image = {
         path: uploadedPath,
         public_id,
       };
@@ -81,11 +80,11 @@ export const update = cathAsync(async(req : Request, res : Response, next : Next
     
         if (file) {
           //delete old image
-          deleteFileFormCloudinary(category.logo.public_id);
+          deleteFileFormCloudinary(category.image.public_id);
     
           // upload new image
-          const { path, public_id } = await upload(file, '/brands');
-          category.logo = {
+          const { path, public_id } = await upload(file, '/category');
+          category.image = {
             path,
             public_id,
           };
@@ -109,7 +108,7 @@ export const remove = cathAsync(
     }
 
     //delete image
-    await deleteFileFormCloudinary(category.logo.public_id);
+    await deleteFileFormCloudinary(category.image.public_id);
 
     //delete brand
     await category.deleteOne();

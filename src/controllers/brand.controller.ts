@@ -4,7 +4,7 @@ import AppError from "../utils/customError.utils";
 import { cathAsync } from "../utils/catchAsync.utils";
 import { sendResponse } from "../utils/sendResponse.utils";
 import { upload } from "../utils/cloudinary.util";
-import { deleteFileFormCloudinary } from "../config/cloudinary.config";
+import { deleteFileFormCloudinary } from "../utils/cloudinary.util";
 
 export const getAll = cathAsync(
   async (req: Request, res: Response, next: NextFunction) => {

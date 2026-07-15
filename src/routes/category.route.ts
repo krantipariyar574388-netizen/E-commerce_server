@@ -18,7 +18,7 @@ router.get("/", getAll);
 
 router.get("/:id", getById);
 
-router.post("/", upload.single("logo") ,create);
+router.post("/", upload.single("image") ,create);
 
 router.put("/:id", update);
 
