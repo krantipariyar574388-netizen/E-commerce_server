@@ -4,6 +4,7 @@ import {errorHandler} from './middlewares/errorHandler.middleware';
 import authRouter from './routes/auth.route';
 import brandRouter from './routes/brand.route'
 import AppError from "./utils/customError.utils";
+import categoryRouter from './routes/category.route'
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.get("/",(req : Request, res : Response) => {
 app.use("/products", productRouter);
 app.use("/auth", authRouter);
 app.use("/brand",brandRouter);
+app.use("/category",categoryRouter);
 
 
 // path not found

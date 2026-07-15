@@ -3,6 +3,8 @@ import Brand from "../models/brand.model";
 import AppError from "../utils/customError.utils";
 import { cathAsync } from "../utils/catchAsync.utils";
 import { sendResponse } from "../utils/sendResponse.utils";
+import { upload } from "../utils/cloudinary.util";
+import { deleteFileFormCloudinary } from "../config/cloudinary.config";
 
 export const getAll = cathAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -50,7 +52,11 @@ export const create = cathAsync(
     });
 
     if (file) {
-      brand.logo = file.path;
+      const { path, public_id } = await upload(file, '/brands');
+      brand.logo = {
+        path,
+        public_id,
+      };
     }
 
     await brand.save();
@@ -66,16 +72,27 @@ export const create = cathAsync(
 export const update = cathAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    const { name, description, logo } = req.body;
+    const { name, description } = req.body;
+    const file = req.file;
 
-    const brand = await Brand.findByIdAndUpdate(
-      id,
-      { name, description, logo },
-      { new: true, runValidators: true }
-    );
+    const brand = await Brand.findOne({_id : id});
 
     if (!brand) {
       throw new AppError(`Brand with id: ${id} not found`, 404);
+    }
+    if (name) brand.name = name;
+    if (description) brand.description = description;
+
+    if (file) {
+      //delete old image
+      deleteFileFormCloudinary(brand.logo.public_id);
+
+      // upload new image
+      const { path, public_id } = await upload(file, '/brands');
+      brand.logo = {
+        path,
+        public_id,
+      };
     }
 
     sendResponse(res, {
@@ -95,6 +112,12 @@ export const remove = cathAsync(
     if (!brand) {
       throw new AppError(`Brand with id: ${id} not found`, 404);
     }
+
+    //delete image
+    await deleteFileFormCloudinary(brand.logo.public_id);
+
+    //delete brand
+    await brand.deleteOne();
 
     sendResponse(res, {
       statusCode: 200,

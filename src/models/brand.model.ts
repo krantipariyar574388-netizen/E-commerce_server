@@ -3,20 +3,23 @@ import mongoose, {Schema} from "mongoose";
 import { ImageSchema } from "./image.model";
 
 interface IBrand extends Document {
-    name : String;
-    description? : String;
-    logo : String;
+    name : string;
+    description? : string;
+    logo : {
+        path : string;
+        public_id : string; 
+    }
 }
 
 const brandSchema : Schema = new mongoose.Schema<IBrand>({
     name : {
-        type : "String",
+        type : String,
         required : [true,"Name is required!"],
         unique : [true, "Brand already exits!"],
         trim : true,
     },
     description : {
-        type : "String",
+        type : String,
         default : "",
         trim :true, 
     },
