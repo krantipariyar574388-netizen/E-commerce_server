@@ -5,6 +5,7 @@ import AppError from "../utils/customError.utils";
 import { cathAsync } from "../utils/catchAsync.utils";
 import { sendResponse } from "../utils/sendResponse.utils";
 import { generateJwtToken } from "../utils/jwt.util";
+import ENV_CONFIG from "../config/env.config";
 
 // 1. Register User
 export const register = cathAsync(async (req: Request, res: Response, next : NextFunction) => {
@@ -74,6 +75,14 @@ export const login = cathAsync(async (req: Request, res: Response, next : NextFu
     email: user.email,
     role: user.role,
   });
+
+  // set cookie header
+  res.cookie("access_token",access_token, {
+    secure : ENV_CONFIG.NODE_ENV === "development" ? false : true,
+    httpOnly : ENV_CONFIG.NODE_ENV === "development" ? false : true,
+    maxAge : ENV_CONFIG.COOKIE_EXPIRY * 24 * 60 * 60 * 1000,
+    sameSite : ENV_CONFIG.NODE_ENV === "development" ? "lax" : "none",
+  })
 
   //* convert user document to object
   const { password: p, __v, ...rest } = user.toObject();

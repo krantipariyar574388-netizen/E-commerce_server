@@ -80,7 +80,7 @@ export const update = cathAsync(async(req : Request, res : Response, next : Next
     
         if (file) {
           //delete old image
-          deleteFileFormCloudinary(category.image.public_id);
+          await deleteFileFormCloudinary(category.image.public_id);
     
           // upload new image
           const { path, public_id } = await upload(file, '/category');
@@ -89,7 +89,9 @@ export const update = cathAsync(async(req : Request, res : Response, next : Next
             public_id,
           };
         }
-    
+
+        await category.save();
+        
         sendResponse(res, {
           statusCode: 200,
           message: "Brand updated successfully!",
