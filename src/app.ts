@@ -5,11 +5,13 @@ import authRouter from './routes/auth.route';
 import brandRouter from './routes/brand.route'
 import AppError from "./utils/customError.utils";
 import categoryRouter from './routes/category.route'
+import cookieParser from "cookie-parser";
 
 const app = express();
 
 // using middleware
 app.use(express.json());
+app.use(cookieParser());
 
 // health route
 app.get("/",(req : Request, res : Response) => {

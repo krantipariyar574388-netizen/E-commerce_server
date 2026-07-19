@@ -6,6 +6,7 @@ import { cathAsync } from "../utils/catchAsync.utils";
 import { sendResponse } from "../utils/sendResponse.utils";
 import { generateJwtToken } from "../utils/jwt.util";
 import ENV_CONFIG from "../config/env.config";
+import { deleteFileFormCloudinary, upload } from "../utils/cloudinary.util";
 
 // 1. Register User
 export const register = cathAsync(async (req: Request, res: Response, next : NextFunction) => {
@@ -31,10 +32,14 @@ export const register = cathAsync(async (req: Request, res: Response, next : Nex
     const hash = await hashPassword(password);
     newUser.password = hash;
 
-    // upload profile image
-    if (file) {
-      newUser.profile_image = file.path;
-    }
+    //* upload profile image to cloudinary
+  if (file) {
+    const { path, public_id } = await upload(file, "/profile_images");
+    newUser.profile_image = {
+      path: path,
+      public_id: public_id,
+    };
+  }
 
     //save user
     await newUser.save();
@@ -92,5 +97,61 @@ sendResponse(res, {
     message: "Login successful",
     data: { user: rest, access_token },
     statusCode: 201,
+  });
+});
+
+export const update = cathAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const { fullName, email, role } = req.body;
+
+    const auth = await Authentication.findByIdAndUpdate(
+      id,
+      { fullName, email, role },
+      { new: true, runValidators: true }
+    );
+
+    if (!auth) {
+      throw new AppError(`user with id: ${id} not found`, 404);
+    }
+
+    sendResponse(res, {
+      statusCode: 200,
+      message: "Product updated successfully!",
+      data: auth,
+    });
+  }
+);
+
+//* change profile image
+// 1  -> token
+// 2  /2
+// auth/change-profile
+export const changeProfileImage = cathAsync(async (req, res) => {
+  const file = req.file;
+  const userId = req.user?._id;
+  if (!file) throw new AppError("image is required", 400);
+
+  const user = await Authentication.findOne({ _id: userId });
+
+  if (!user) throw new AppError("user not found", 404);
+
+  const { path, public_id } = await upload(file, "/profile_images");
+
+  if (user.profile_image) {
+    deleteFileFormCloudinary(user.profile_image.public_id);
+  }
+
+  user.profile_image = {
+    path,
+    public_id,
+  };
+
+  await user.save();
+
+  sendResponse(res, {
+    message: "profile image updated",
+    statusCode: 201,
+    data: user,
   });
 });

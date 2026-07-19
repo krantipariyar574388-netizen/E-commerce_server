@@ -9,6 +9,11 @@ interface IJwtPayload {
   role: Role;
 }
 
+interface IJwtReturn extends IJwtPayload {
+  iat : number;
+  exp : number;
+}
+
 export const generateJwtToken = (payload: IJwtPayload) => {
   try {
     return jwt.sign(payload, ENV_CONFIG.JWT_SECRET, {
@@ -19,3 +24,13 @@ export const generateJwtToken = (payload: IJwtPayload) => {
     throw new Error("Something went wrong");
   }
 };
+
+// verify token
+export const verifyToken = (token : string) => {
+  try{
+    return jwt.verify(token, ENV_CONFIG.JWT_SECRET) as IJwtReturn;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Something went wrong");
+  }
+}

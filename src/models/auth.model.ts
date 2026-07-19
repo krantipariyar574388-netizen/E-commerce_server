@@ -3,47 +3,56 @@ import { Role } from "../@types/enum.types";
 import { ImageSchema } from "./image.model";
 
 interface IUser extends Document {
-  fullName : string;
-  email : string;
-  password : string;
-  role : Role,
-  profile_image? : string;
+  fullName: string;
+  email: string;
+  password: string;
+  role: Role;
+  profile_image?: {
+    path: string;
+    public_id: string;
+  };
 }
 
 const authSchema: Schema = new mongoose.Schema<IUser>(
   {
     fullName: {
       type: String,
-      required: [true,'Name is required'],
+      required: [true, "Name is required"],
       minLength: 3,
       trim: true,
     },
     email: {
       type: String,
-      required: [true,'Email is required'],
-      unique: [true,'Already Exist!'],
+      required: [true, "Email is required"],
+      unique: [true, "Already Exist!"],
       lowercase: true,
       trim: true,
     },
-    role : {
-      type : String,
-      enum : Object.values(Role),
-      default : Role.USER,
+    role: {
+      type: String,
+      enum: Object.values(Role),
+      default: Role.USER,
     },
     password: {
       type: String,
-      required: [true,'Password is required'],
+      required: [true, "Password is required"],
       minLength: 6,
-      select : false,
+      select: false,
     },
     profile_image: {
-      type: ImageSchema,
-      default: null,
+      path: {
+        type: String,
+        required: true
+      },
+      public_id: {
+        type: String,
+        required: true
+      },
     },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const Authentication = mongoose.model<IUser>("Authentication", authSchema);

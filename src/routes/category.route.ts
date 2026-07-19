@@ -8,6 +8,7 @@ import {
 } from "../controllers/category.controller";
 
 import { uploader } from "../middlewares/multer.middleware";
+import { authenticate } from "../middlewares/authenticate.middleware";
 
 const router: Router = express.Router();
 
@@ -16,7 +17,7 @@ const upload = uploader();
 
 router.get("/", getAll);
 
-router.get("/:id", getById);
+router.get("/:id", authenticate, getById);
 
 router.post("/", upload.single("image") ,create);
 
