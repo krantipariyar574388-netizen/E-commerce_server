@@ -1,8 +1,26 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Types, Document } from "mongoose";
 import { ImageSchema } from "./image.model";
 
+export interface IProduct extends Document {
+  name: string;
+  rate: string;
+  quantity: number;
+  description : string;
+  cover_image: {
+    path: string;
+    public_id: string;
+  };
+  brand: Types.ObjectId;
+  category: Types.ObjectId;
+  images: {
+    path: string;
+    public_id: string;
+  }[]; // Multiple gallery images ko lagi Array banako
+  is_featured: boolean;
+  newArrival: boolean;
+}
 
-const productSchema: Schema = new mongoose.Schema({
+const productSchema: Schema = new mongoose.Schema<IProduct>({
     name : {
         type : String,
         required : true,
@@ -16,9 +34,22 @@ const productSchema: Schema = new mongoose.Schema({
         type : Number,
         required : true,
     },
-    cover_image : {
-        type : ImageSchema,
-        required : [true, "Cover image is required"],
+    description: {
+      type: String,
+      required: [true, "description is required"],
+      trim: true,
+      minLength: [10, "name must be at least 50 characters long"],
+      maxLength: [2000, "name must not exceed 2000 characters"],
+    },
+    cover_image: {
+      path: {
+        type: String,
+        required: [true, "Cover image path is required"],
+      },
+      public_id: {
+        type: String,
+        required: [true, "Cover image public_id is required"],
+      },
     },
     brand : {
         type : mongoose.Schema.Types.ObjectId,
@@ -41,7 +72,7 @@ const productSchema: Schema = new mongoose.Schema({
     }
 });
 
-const Product = mongoose.model("product", productSchema);
+const Product = mongoose.model<IProduct>("product", productSchema);
 
 export default Product;
 

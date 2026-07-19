@@ -10,12 +10,12 @@ export interface IWishList extends Document {
 
 const WishListSchema : Schema = new mongoose.Schema<IWishList>({
     user : {
-        type : Schema.Types.ObjectId,
+        type : mongoose.Schema.Types.ObjectId,
         ref : "Authentication",
         required : [true, "User ID is required!!"],
     },
     product : {
-        type : Schema.Types.ObjectId,
+        type : mongoose.Schema.Types.ObjectId,
         ref : "Product",
         required : [true, "Product ID is required!!"],
     },

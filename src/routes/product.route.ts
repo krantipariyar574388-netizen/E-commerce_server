@@ -34,7 +34,14 @@ router.post("/",
     create
 );
 
-router.put("/:id", update);
+router.put(
+  "/:id", 
+  upload.fields([
+    { name: "cover_image", maxCount: 1 },
+    { name: "images", maxCount: 10 }
+  ]), 
+  update
+);
 
 router.delete("/:id", remove);
 
