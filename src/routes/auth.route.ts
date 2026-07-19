@@ -2,7 +2,6 @@ import express, { Router } from "express";
 import {
   register,
   login, 
-  update,
   profileChange,
 } from "../controllers/auth.controller";
 import { uploader } from "../middlewares/multer.middleware";

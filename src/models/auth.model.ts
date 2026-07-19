@@ -1,6 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 import { Role } from "../@types/enum.types";
-import { ImageSchema } from "./image.model";
 
 interface IUser extends Document {
   fullName: string;

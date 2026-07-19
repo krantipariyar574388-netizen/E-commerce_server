@@ -100,34 +100,11 @@ sendResponse(res, {
   });
 });
 
-export const update = cathAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
-    const { fullName, email, role } = req.body;
-
-    const auth = await Authentication.findByIdAndUpdate(
-      id,
-      { fullName, email, role },
-      { new: true, runValidators: true }
-    );
-
-    if (!auth) {
-      throw new AppError(`user with id: ${id} not found`, 404);
-    }
-
-    sendResponse(res, {
-      statusCode: 200,
-      message: "Product updated successfully!",
-      data: auth,
-    });
-  }
-);
-
 //* change profile image
 // 1  -> token
 // 2  /2
 // auth/change-profile
-export const changeProfileImage = cathAsync(async (req, res) => {
+export const profileChange = cathAsync(async (req, res) => {
   const file = req.file;
   const userId = req.user?._id;
   if (!file) throw new AppError("image is required", 400);
