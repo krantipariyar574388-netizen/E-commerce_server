@@ -13,10 +13,13 @@ export const getAll = cathAsync(
 
     sendResponse(res, {
       statusCode: 200,
-      message: product.length > 0 ? "Product fetched successfully!" : "No products found",
+      message:
+        product.length > 0
+          ? "Product fetched successfully!"
+          : "No products found",
       data: product,
     });
-  }
+  },
 );
 
 export const getById = cathAsync(
@@ -34,13 +37,22 @@ export const getById = cathAsync(
       message: "Product fetched successfully!",
       data: product,
     });
-  }
+  },
 );
 
 export const create = cathAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { name, rate, quantity, description, brand, category, is_featured, newArrival } = req.body;
-    
+    const {
+      name,
+      rate,
+      quantity,
+      description,
+      brand,
+      category,
+      is_featured,
+      newArrival,
+    } = req.body;
+
     const { cover_image, images } = req.files as {
       cover_image: Express.Multer.File[];
       images: Express.Multer.File[];
@@ -61,12 +73,12 @@ export const create = cathAsync(
       brand,
       category,
       is_featured,
-      newArrival
+      newArrival,
     });
 
     //cover images
     const { path, public_id } = await upload(cover_image[0], folder);
-    product.cover_image= {
+    product.cover_image = {
       path,
       public_id,
     };
@@ -76,10 +88,10 @@ export const create = cathAsync(
       const promises = images.map((file) => upload(file, folder));
       const files = await Promise.allSettled(promises);
       const successImages = files
-      .filter((file) => file.status == "fulfilled")
-      .map((file) => file.value);
+        .filter((file) => file.status == "fulfilled")
+        .map((file) => file.value);
 
-      product.set("images",successImages);
+      product.set("images", successImages);
     }
 
     await product.save();
@@ -89,15 +101,25 @@ export const create = cathAsync(
       message: "Product created successfully!",
       data: product,
     });
-  }
+  },
 );
 
 export const update = cathAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    const { name, rate, quantity, description, brand, category, is_featured, newArrival } = req.body;
+    const {
+      name,
+      rate,
+      quantity,
+      description,
+      brand,
+      category,
+      is_featured,
+      newArrival,
+      deleted_images,
+    } = req.body;
 
-    const product = await Product.findById(id);
+    const product = await Product.findOne({ _id: id });
     if (!product) {
       throw new AppError(`Product with id: ${id} not found`, 404);
     }
@@ -111,32 +133,28 @@ export const update = cathAsync(
     if (is_featured !== undefined) product.is_featured = is_featured;
     if (newArrival !== undefined) product.newArrival = newArrival;
 
-    const files = req.files as {
+    const { cover_image, images } = req.files as {
       cover_image?: Express.Multer.File[];
       images?: Express.Multer.File[];
     };
 
-    if (files && files.cover_image && files.cover_image.length > 0) {
-
-      if (product.cover_image && product.cover_image.public_id) {
-        await deleteFileFormCloudinary(product.cover_image.public_id);
-      }
-
-      const { path, public_id } = await upload(files.cover_image[0], folder);
+    if (cover_image && cover_image.length > 0) {
+      deleteFileFormCloudinary(product.cover_image.public_id);
+      const { path, public_id } = await upload(cover_image[0], folder);
       product.cover_image = { path, public_id };
     }
 
-    if (files && files.images && files.images.length > 0) {
-      
-      const promises = files.images.map((file) => upload(file, folder));
-      const uploadResults = await Promise.allSettled(promises);
-      
-      const successImages = uploadResults
-        .filter((result) => result.status === "fulfilled")
-        .map((result) => (result as PromiseFulfilledResult<any>).value);
-
-      const currentImages = product.get("images") || [];
-      product.set("images", [...currentImages, ...successImages]);
+    if (
+      deleted_images &&
+      Array.isArray(deleted_images) &&
+      deleted_images.length > 0
+    ) {
+      //deleted image from cloud
+      //filter product images
+    }
+    if (images && images.length > 0) {
+      // upload new images to cloud
+      // add images pn product.images
     }
 
     await product.save();
@@ -146,7 +164,7 @@ export const update = cathAsync(
       message: "Product updated successfully!",
       data: product,
     });
-  }
+  },
 );
 
 export const remove = cathAsync(
@@ -164,7 +182,7 @@ export const remove = cathAsync(
       message: "Product deleted successfully!",
       data: null,
     });
-  }
+  },
 );
 
 // get by category
