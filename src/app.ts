@@ -7,6 +7,7 @@ import AppError from "./utils/customError.utils";
 import categoryRouter from './routes/category.route'
 import cookieParser from "cookie-parser";
 import WishListRouter from "./routes/wishList.route";
+import cartRouter from "./routes/cart.route";
 
 const app = express();
 
@@ -28,7 +29,8 @@ app.use("/products", productRouter);
 app.use("/auth", authRouter);
 app.use("/brand",brandRouter);
 app.use("/category",categoryRouter);
-app.use("/wishList",WishListRouter);
+app.use("/wishlist",WishListRouter);
+app.use("/cart",cartRouter);
 
 
 // path not found

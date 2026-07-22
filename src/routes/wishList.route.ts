@@ -8,7 +8,7 @@ import { authenticate } from "../middlewares/authenticate.middleware";
 
 const router: Router = express.Router();
 
-router.use(authenticate);
+router.use(authenticate());
 
 router.get("/",getUserWishlist);
 
