@@ -6,9 +6,9 @@ export const transporter = nodemailer.createTransport({
     host : ENV_CONFIG.SMTP_HOST,
     service : ENV_CONFIG.SMTP_SERVICE,
     port : ENV_CONFIG.SMTP_PORT,
-    secure : true,
+    secure : Number(ENV_CONFIG.SMTP_PORT) === 465,
     auth : {
-        user : ENV_CONFIG.SMTP_MAIL,
+        user : ENV_CONFIG.SMTP_MAIL_FROM,
         pass : ENV_CONFIG.SMTP_PASSWORD,
     },
 });

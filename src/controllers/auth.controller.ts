@@ -8,6 +8,7 @@ import { generateJwtToken } from "../utils/jwt.util";
 import ENV_CONFIG from "../config/env.config";
 import { deleteFileFormCloudinary, upload } from "../utils/cloudinary.util";
 import { sendEmail } from "../utils/sendEmail.util";
+import { newLoginDetectedHtml } from "../utils/email.template.util";
 
 // 1. Register User
 export const register = cathAsync(
@@ -45,11 +46,24 @@ export const register = cathAsync(
     //save user
     await newUser.save();
 
+    // sendEmail({
+    //   to: newUser.email,
+    //   subject: "Account created",
+    //   html: `<div><h2> hi iam kranti </h2></div>`,
+    //   attachments: [],
+    // });
+
+       //* send email
     sendEmail({
       to: newUser.email,
       subject: "Account created",
-      html: `<div><h2> hi iam kranti </h2></div>`,
-      attachments: [],
+      html: newLoginDetectedHtml({
+        email: newUser.email,
+        fullName: newUser.fullName,
+        loginAt: new Date(Date.now()),
+        userAgent: req.headers["user-agent"] as string,
+      }),
+      attachments: []
     });
 
     // success response
@@ -105,9 +119,14 @@ export const login = cathAsync(
     //* send email
     sendEmail({
       to: user.email,
-      subject: "Account opened",
-      html: `<div><h2> Account successfull login </h2></div>`,
-      attachments: [],
+      subject: "New login detected",
+      html: newLoginDetectedHtml({
+        email: user.email,
+        fullName: user.fullName,
+        loginAt: new Date(Date.now()),
+        userAgent: req.headers["user-agent"] as string,
+      }),
+      attachments: []
     });
 
     sendResponse(res, {

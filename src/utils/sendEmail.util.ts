@@ -16,7 +16,7 @@ export const sendEmail = async (options: IMailOptions) => {
       to: options.to,
       html: options.html,
       subject: options.subject,
-      from: `"${ENV_CONFIG.SENDER_NAME}" <${ENV_CONFIG.SMTP_MAIL}>`,
+      from: `"${ENV_CONFIG.SENDER_NAME}" <${ENV_CONFIG.SMTP_MAIL_FROM}>`,
     };
 
     if(options.cc) {

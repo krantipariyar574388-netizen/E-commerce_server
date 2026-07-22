@@ -18,7 +18,7 @@ const ENV_CONFIG = {
   SMTP_HOST: process.env.SMTP_HOST!!,
   SMTP_PORT: Number(process.env.SMTP_PORT) || 465,
   SMTP_SERVICE: process.env.SMTP_SERVICE || "gmail",
-  SMTP_MAIL: process.env.SMTP_MAIL!!,
+  SMTP_MAIL_FROM: process.env.SMTP_MAIL_FROM!!,
   SMTP_PASSWORD: process.env.SMTP_PASSWORD!!,
   SENDER_NAME: process.env.SENDER_NAME || "TEAM_15",
 };
