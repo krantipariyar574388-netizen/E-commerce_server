@@ -8,7 +8,29 @@ import { deleteFileFormCloudinary } from "../utils/cloudinary.util";
 
 export const getAll = cathAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const brands = await Brand.find({}).sort({ createdAt: -1 });
+    const filter : Record<string, any> = {};
+    const { query } = req.query;
+    if(query){
+      // filter.name = {
+      //   $regex : query,
+      //   $options : "i",
+      // };
+      filter.$or = [
+        {
+          name : {
+            $regex : query, // search
+            $options : "i", //case sensitive
+          },
+        },
+        {
+          description : {
+            $regex : query,
+            $options : "i",
+          },
+        },
+      ];
+    }
+    const brands = await Brand.find(filter);
 
     sendResponse(res, {
       statusCode: 200,

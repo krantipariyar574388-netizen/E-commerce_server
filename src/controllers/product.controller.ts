@@ -9,7 +9,29 @@ const folder = "/products";
 
 export const getAll = cathAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const product = await Product.find({}).sort({ createdAt: -1 });
+    const filter : Record<string, any> = {};
+    const { query } = req.query;
+    if(query){
+      // filter.name = {
+      //   $regex : query,
+      //   $options : "i",
+      // };
+      filter.$or = [
+        {
+          name : {
+            $regex : query, // search
+            $options : "i", //case sensitive
+          },
+        },
+        {
+          description : {
+            $regex : query,
+            $options : "i",
+          },
+        },
+      ];
+    }
+    const product = await Product.find(filter);
 
     sendResponse(res, {
       statusCode: 200,
