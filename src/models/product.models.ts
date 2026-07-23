@@ -3,7 +3,7 @@ import { ImageSchema } from "./image.model";
 
 export interface IProduct extends Document {
   name: string;
-  rate: string;
+  rate: number;
   quantity: number;
   description : string;
   cover_image: {
@@ -27,8 +27,8 @@ const productSchema: Schema = new mongoose.Schema<IProduct>({
         minLength : 3,
     },
     rate : {
-        type : String,
-        required : true,
+        type : Number,
+        required : [true, "Rate is required"],
     },
     quantity : {
         type : Number,
@@ -53,7 +53,7 @@ const productSchema: Schema = new mongoose.Schema<IProduct>({
     },
     brand : {
         type : mongoose.Schema.Types.ObjectId,
-        ref : "brand",
+        ref : "Brand",
         required : [true, "brand is required"],
     },
     category : {

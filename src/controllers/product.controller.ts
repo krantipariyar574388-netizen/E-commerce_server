@@ -5,12 +5,13 @@ import { cathAsync } from "../utils/catchAsync.utils";
 import { sendResponse } from "../utils/sendResponse.utils";
 import { deleteFileFormCloudinary, upload } from "../utils/cloudinary.util";
 
+
 const folder = "/products";
 
 export const getAll = cathAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const filter : Record<string, any> = {};
-    const { query } = req.query;
+    const { query, category, brand, price, minPrice, maxPrice } = req.query;
     if(query){
       // filter.name = {
       //   $regex : query,
@@ -31,7 +32,33 @@ export const getAll = cathAsync(
         },
       ];
     }
-    const product = await Product.find(filter);
+
+    if(category) {
+      filter.category = category;
+    }
+
+    if(brand) {
+      filter.brand = brand;
+    }
+
+    // todo : price range filter
+    if (price) {
+      filter.rate = Number(price);
+    }
+
+    if(minPrice || maxPrice){
+      filter.rate = {};
+      if(minPrice){
+        filter.rate.$gte = Number(minPrice);
+      }
+      if(maxPrice){
+        filter.rate.$lte = Number(maxPrice);
+      }
+    }
+
+    const product = await Product.find(filter)
+    .populate("category")
+    .populate("brand");
 
     sendResponse(res, {
       statusCode: 200,
